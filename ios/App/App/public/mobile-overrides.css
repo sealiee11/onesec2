@@ -1,0 +1,408 @@
+/* ============================================================
+   TOUSTREAM — native mobile-app skin (injected on every page)
+   Targets the real DOM at toustream.xyz
+   ============================================================ */
+
+:root {
+  --ts-bg:        #0b0d14;
+  --ts-bg-elev:   #14171f;
+  --ts-bg-card:   #181c26;
+  --ts-fg:        #f4f5fa;
+  --ts-fg-dim:    #8a90a3;
+  --ts-accent:    #ff2d55;
+  --ts-accent-2:  #ff5d77;
+  --ts-border:    rgba(255,255,255,.06);
+  --ts-tabbar-h:  64px;
+  --ts-topbar-h:  52px;
+  --ts-safe-top:    env(safe-area-inset-top, 0px);
+  --ts-safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* ---------- global reset ---------- */
+html, body {
+  background: var(--ts-bg) !important;
+  color: var(--ts-fg) !important;
+  -webkit-tap-highlight-color: transparent !important;
+  -webkit-text-size-adjust: 100% !important;
+  overscroll-behavior-y: contain !important;
+}
+body {
+  padding-top:    calc(var(--ts-topbar-h) + var(--ts-safe-top)) !important;
+  padding-bottom: calc(var(--ts-tabbar-h) + var(--ts-safe-bottom) + 8px) !important;
+}
+* { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+input, textarea, [contenteditable="true"] { -webkit-user-select: text; user-select: text; }
+
+/* hide native scrollbars in WebView */
+::-webkit-scrollbar { width: 0; height: 0; }
+* { scrollbar-width: none; }
+
+/* ---------- HIDE the desktop chrome ---------- */
+.navbar,
+.site-footer,
+footer.site-footer {
+  display: none !important;
+}
+.nav-hamburger, #hamburger-btn {
+  display: none !important;
+}
+
+/* ---------- TOP BAR (injected by JS) ---------- */
+#ts-topbar {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: calc(var(--ts-topbar-h) + var(--ts-safe-top));
+  padding-top: var(--ts-safe-top);
+  background: rgba(11,13,20,.92);
+  backdrop-filter: blur(14px) saturate(140%);
+  -webkit-backdrop-filter: blur(14px) saturate(140%);
+  border-bottom: 1px solid var(--ts-border);
+  display: flex; align-items: center; justify-content: space-between;
+  padding-left: 14px; padding-right: 12px;
+  z-index: 9998;
+}
+#ts-topbar .ts-brand {
+  display: flex; align-items: center; gap: 8px;
+  font-weight: 800; font-size: 19px; letter-spacing: -.3px;
+  background: linear-gradient(180deg,#fff 0%,#d6d9e3 100%);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+#ts-topbar .ts-brand i {
+  color: var(--ts-accent);
+  -webkit-text-fill-color: var(--ts-accent);
+  font-size: 17px;
+}
+#ts-topbar .ts-back {
+  width: 38px; height: 38px;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(255,255,255,.06);
+  border-radius: 12px; border: none;
+  color: #fff; font-size: 18px;
+  margin-right: 8px;
+}
+#ts-topbar .ts-back:active { background: rgba(255,255,255,.14); }
+#ts-topbar .ts-actions { display: flex; gap: 8px; align-items: center; }
+#ts-topbar .ts-actions a {
+  width: 38px; height: 38px; border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(255,255,255,.06);
+  color: #fff; text-decoration: none; font-size: 15px;
+}
+#ts-topbar .ts-actions a:active { background: rgba(255,255,255,.14); }
+
+/* ---------- BOTTOM TAB BAR (injected by JS) ---------- */
+#ts-tabbar {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  height: calc(var(--ts-tabbar-h) + var(--ts-safe-bottom));
+  padding-bottom: var(--ts-safe-bottom);
+  background: rgba(11,13,20,.94);
+  backdrop-filter: blur(18px) saturate(140%);
+  -webkit-backdrop-filter: blur(18px) saturate(140%);
+  border-top: 1px solid var(--ts-border);
+  display: flex; align-items: stretch; justify-content: space-around;
+  z-index: 9998;
+}
+#ts-tabbar a {
+  flex: 1 1 0; min-width: 0;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 4px;
+  color: var(--ts-fg-dim);
+  text-decoration: none;
+  font-size: 10.5px; font-weight: 600;
+  letter-spacing: .2px;
+  transition: color .15s ease, transform .15s ease;
+  position: relative;
+}
+#ts-tabbar a i { font-size: 19px; transition: transform .2s ease; }
+#ts-tabbar a:active i { transform: scale(.9); }
+#ts-tabbar a.is-active { color: var(--ts-fg); }
+#ts-tabbar a.is-active i {
+  color: var(--ts-accent);
+  filter: drop-shadow(0 0 8px rgba(255,45,85,.55));
+}
+#ts-tabbar a.is-active::before {
+  content: "";
+  position: absolute; top: 8px;
+  width: 28px; height: 3px; border-radius: 2px;
+  background: var(--ts-accent);
+  box-shadow: 0 0 10px rgba(255,45,85,.7);
+}
+
+/* watchlist badge inside tabbar */
+#ts-tabbar a .ts-badge {
+  position: absolute;
+  top: 6px; right: calc(50% - 18px);
+  min-width: 16px; height: 16px; padding: 0 4px;
+  background: var(--ts-accent);
+  color: #fff; font-size: 10px; font-weight: 700;
+  border-radius: 999px;
+  display: none;
+  align-items: center; justify-content: center;
+  line-height: 1;
+}
+
+/* ---------- HERO / featured ---------- */
+.featured-content, .featured-content#hero {
+  margin: 0 12px 18px !important;
+  height: 56vw !important; min-height: 220px !important; max-height: 360px !important;
+  border-radius: 18px !important;
+  padding: 16px 18px !important;
+  position: relative !important;
+  display: flex !important; flex-direction: column !important; justify-content: flex-end !important;
+  background-size: cover !important; background-position: center !important;
+  box-shadow: 0 18px 40px -20px rgba(0,0,0,.7) !important;
+  overflow: hidden !important;
+  isolation: isolate;
+}
+.featured-content::after {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(180deg, rgba(11,13,20,0) 30%, rgba(11,13,20,.85) 100%);
+  z-index: 0;
+}
+.featured-content > * { position: relative; z-index: 1; }
+.featured-title {
+  font-size: 22px !important; font-weight: 800 !important; line-height: 1.1 !important;
+  margin: 0 0 6px !important; color: #fff !important;
+  text-shadow: 0 2px 12px rgba(0,0,0,.5);
+}
+.featured-desc {
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+  overflow: hidden;
+  font-size: 12.5px !important; color: rgba(255,255,255,.82) !important;
+  margin: 0 0 12px !important; line-height: 1.4 !important;
+}
+.featured-button, #hero-watch-btn {
+  align-self: flex-start !important;
+  background: #fff !important; color: #0b0d14 !important;
+  border: none !important; padding: 10px 22px !important;
+  border-radius: 999px !important;
+  font-weight: 800 !important; font-size: 13px !important;
+  letter-spacing: .5px !important;
+  display: inline-flex !important; align-items: center !important; gap: 8px !important;
+}
+.featured-button::before, #hero-watch-btn::before {
+  content: "\25B6"; font-size: 11px;
+}
+
+/* ---------- CONTAINER ---------- */
+.container { padding: 0 !important; max-width: 100% !important; }
+
+/* ---------- ROW (carousel) ---------- */
+.movie-list-container { margin: 0 0 22px !important; }
+.movie-list-title {
+  font-size: 16px !important; font-weight: 800 !important;
+  letter-spacing: -.2px !important;
+  margin: 4px 14px 10px !important;
+  color: var(--ts-fg) !important;
+}
+.movie-list-wrapper { position: relative !important; }
+
+/* kill the desktop carousel arrows */
+.movie-list-wrapper > .arrow,
+.movie-list-wrapper > .arrow-left,
+.movie-list-wrapper > .arrow-right,
+.arrow.arrow-left, .arrow.arrow-right {
+  display: none !important;
+}
+
+.movie-list {
+  display: flex !important; flex-direction: row !important;
+  gap: 10px !important;
+  padding: 4px 14px 6px !important;
+  overflow-x: auto !important; overflow-y: hidden !important;
+  scroll-snap-type: x mandatory !important;
+  -webkit-overflow-scrolling: touch !important;
+  transform: none !important;
+  width: auto !important;
+}
+.movie-list > * {
+  flex: 0 0 auto !important;
+  scroll-snap-align: start;
+}
+
+/* cards — match common toustream card classnames defensively */
+.movie-list .movie,
+.movie-list .movie-card,
+.movie-list .card,
+.movie-list > a,
+.movie-list > div {
+  width: 128px !important;
+  border-radius: 12px !important;
+  overflow: hidden !important;
+  background: var(--ts-bg-card) !important;
+  box-shadow: 0 8px 18px -10px rgba(0,0,0,.6);
+  transition: transform .15s ease;
+}
+.movie-list .movie:active,
+.movie-list .movie-card:active,
+.movie-list > a:active,
+.movie-list > div:active { transform: scale(.96); }
+
+.movie-list img {
+  display: block !important;
+  width: 100% !important; height: 192px !important;
+  object-fit: cover !important;
+  border-radius: 0 !important;
+  background: #1a1d27;
+}
+.movie-list .title, .movie-list .movie-title, .movie-list h2, .movie-list h3 {
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  padding: 8px 8px 10px !important;
+  margin: 0 !important;
+  color: var(--ts-fg) !important;
+  display: -webkit-box !important;
+  -webkit-line-clamp: 2 !important;
+  -webkit-box-orient: vertical !important;
+  overflow: hidden !important;
+  line-height: 1.25 !important;
+  min-height: 40px;
+}
+
+/* ---------- SKELETONS (toustream uses .skeleton class) ---------- */
+.movie-list .skeleton,
+.skeleton {
+  background:
+    linear-gradient(90deg, #181c26 0%, #20242f 50%, #181c26 100%) !important;
+  background-size: 200% 100% !important;
+  animation: ts-shimmer 1.2s infinite linear !important;
+  border-radius: 12px !important;
+}
+@keyframes ts-shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* ---------- DRAWER (the site's built-in mobile-drawer) ---------- */
+.mobile-drawer {
+  background: rgba(11,13,20,.97) !important;
+  backdrop-filter: blur(20px) saturate(140%) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(140%) !important;
+  border-left: 1px solid var(--ts-border) !important;
+  padding-top: calc(var(--ts-safe-top) + 18px) !important;
+}
+.mobile-drawer a {
+  font-size: 15px !important; font-weight: 600 !important;
+  padding: 14px 22px !important;
+  color: var(--ts-fg) !important;
+  display: flex !important; align-items: center !important; gap: 14px !important;
+  border-bottom: 1px solid var(--ts-border);
+}
+.mobile-drawer a i { color: var(--ts-accent); width: 22px; text-align: center; }
+.mobile-drawer-divider { border-color: var(--ts-border) !important; margin: 8px 0 !important; }
+
+/* ---------- SEARCH PAGE ---------- */
+input[type="search"], input[type="text"], input.search-input, #searchInput, #search {
+  background: var(--ts-bg-elev) !important;
+  color: var(--ts-fg) !important;
+  border: 1px solid var(--ts-border) !important;
+  border-radius: 14px !important;
+  padding: 14px 16px !important;
+  font-size: 15px !important;
+  width: calc(100% - 28px) !important;
+  margin: 8px 14px !important;
+  box-sizing: border-box;
+  -webkit-appearance: none; appearance: none;
+}
+input:focus { outline: none !important; border-color: var(--ts-accent) !important; }
+
+/* ---------- BUTTONS / general links ---------- */
+button { -webkit-appearance: none; appearance: none; font-family: inherit; }
+button:active { opacity: .8; }
+
+/* ---------- DETAIL/MODAL ---------- */
+.modal, .movie-modal, #modal, [class*="modal"] {
+  background: rgba(0,0,0,.85) !important;
+  backdrop-filter: blur(8px);
+}
+.modal-content, .movie-modal-content {
+  background: var(--ts-bg-elev) !important;
+  border-radius: 18px !important;
+  border: 1px solid var(--ts-border) !important;
+  color: var(--ts-fg) !important;
+}
+
+/* ---------- TOAST ---------- */
+#sync-toast {
+  bottom: calc(var(--ts-tabbar-h) + var(--ts-safe-bottom) + 16px) !important;
+  background: rgba(20,23,31,.96) !important;
+  color: #fff !important;
+  border: 1px solid var(--ts-border) !important;
+  border-radius: 12px !important;
+  font-size: 13px !important;
+}
+
+/* ---------- WATCHLIST BADGE on top bar (legacy) ---------- */
+#wl-badge { display: none !important; }
+
+/* ---------- PLAYER / IFRAME page (watch.html etc.) ---------- */
+body.ts-fullscreen,
+body.ts-player-open {
+  padding: 0 !important;
+  background: #000 !important;
+  overflow: hidden !important;
+}
+body.ts-fullscreen #ts-topbar,
+body.ts-fullscreen #ts-tabbar,
+body.ts-player-open #ts-topbar,
+body.ts-player-open #ts-tabbar { display: none !important; }
+
+/* Any player-like iframe (vidsrc/embed/etc.) is forced full-viewport. */
+iframe.full, iframe#player,
+iframe[src*="vidsrc"], iframe[src*="embed"], iframe[src*="player"],
+iframe[src*="2embed"], iframe[src*="autoembed"], iframe[src*="filemoon"],
+iframe[src*="streamtape"], iframe[src*="superembed"], iframe[src*="multiembed"],
+iframe[src*="smashy"], iframe[src*="moviesapi"], iframe[src*="vidstream"],
+iframe[src*="vidcloud"] {
+  position: fixed !important;
+  inset: 0 !important;
+  top: 0 !important; left: 0 !important; right: 0 !important; bottom: 0 !important;
+  width: 100vw !important; height: 100vh !important;
+  width: 100dvw !important; height: 100dvh !important;
+  max-width: none !important; max-height: none !important;
+  border: 0 !important;
+  z-index: 99999 !important;
+  background: #000 !important;
+}
+
+/* While a player iframe is mounted, expand its modal/wrapper too. */
+body.ts-player-open .modal,
+body.ts-player-open .movie-modal,
+body.ts-player-open #modal,
+body.ts-player-open [class*="modal"],
+body.ts-player-open [id*="player"],
+body.ts-player-open [class*="player"] {
+  position: fixed !important;
+  inset: 0 !important;
+  width: 100vw !important; height: 100vh !important;
+  width: 100dvw !important; height: 100dvh !important;
+  margin: 0 !important; padding: 0 !important;
+  border-radius: 0 !important;
+  background: #000 !important;
+  z-index: 99998 !important;
+}
+
+/* Any direct <video> the site might render also covers the viewport. */
+body.ts-player-open video {
+  position: fixed !important;
+  inset: 0 !important;
+  width: 100vw !important; height: 100vh !important;
+  width: 100dvw !important; height: 100dvh !important;
+  object-fit: contain !important;
+  background: #000 !important;
+  z-index: 99999 !important;
+}
+
+/* ---------- safe text rendering ---------- */
+h1,h2,h3,h4 { letter-spacing: -.3px; }
+
+/* ---------- ripple feedback ---------- */
+.movie-list > * { position: relative; }
+.movie-list > *::after {
+  content: ""; position: absolute; inset: 0;
+  background: radial-gradient(circle, rgba(255,255,255,.25) 0%, rgba(255,255,255,0) 60%);
+  opacity: 0; transition: opacity .3s ease; pointer-events: none;
+  border-radius: inherit;
+}
+.movie-list > *:active::after { opacity: .35; transition: opacity 0s; }

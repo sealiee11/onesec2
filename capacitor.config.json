@@ -1,0 +1,54 @@
+{
+  "appId": "xyz.toustream.app",
+  "appName": "Toustream",
+  "webDir": "www",
+  "bundledWebRuntime": false,
+  "server": {
+    "url": "https://toustream.xyz",
+    "cleartext": false,
+    "androidScheme": "https",
+    "iosScheme": "https",
+    "allowNavigation": [
+      "toustream.xyz",
+      "*.toustream.xyz",
+      "*.cloudfront.net",
+      "*.cloudflare.com",
+      "*.googleapis.com",
+      "*.gstatic.com",
+      "*.tmdb.org",
+      "image.tmdb.org",
+      "*.themoviedb.org"
+    ]
+  },
+  "android": {
+    "backgroundColor": "#0b0d14",
+    "allowMixedContent": false,
+    "captureInput": true,
+    "webContentsDebuggingEnabled": false,
+    "useLegacyBridge": false
+  },
+  "ios": {
+    "backgroundColor": "#0b0d14",
+    "contentInset": "always",
+    "scrollEnabled": true,
+    "limitsNavigationsToAppBoundDomains": false
+  },
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 1200,
+      "launchAutoHide": true,
+      "backgroundColor": "#0b0d14",
+      "androidSplashResourceName": "splash",
+      "androidScaleType": "CENTER_CROP",
+      "showSpinner": true,
+      "androidSpinnerStyle": "large",
+      "iosSpinnerStyle": "large",
+      "spinnerColor": "#ff2d55"
+    },
+    "StatusBar": {
+      "style": "DARK",
+      "backgroundColor": "#0b0d14",
+      "overlaysWebView": false
+    }
+  }
+}
