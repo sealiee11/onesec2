@@ -1,0 +1,83 @@
+name: Build iOS .ipa (unsigned)
+
+on:
+  push:
+    branches: [main, master]
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build unsigned .ipa on macOS
+    runs-on: macos-14
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Select Xcode
+        run: sudo xcode-select -s /Applications/Xcode_15.4.app || sudo xcode-select -s /Applications/Xcode.app
+      - run: xcodebuild -version
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install npm deps
+        run: npm ci || npm install
+
+      - name: Capacitor sync (ios)
+        run: npx cap sync ios
+
+      - name: pod install
+        working-directory: ios/App
+        run: |
+          # GitHub macOS runners ship with CocoaPods preinstalled, but pin if missing
+          which pod || sudo gem install cocoapods
+          pod install --repo-update
+
+      - name: Build .app (no signing)
+        working-directory: ios/App
+        run: |
+          set -eo pipefail
+          xcodebuild \
+            -workspace App.xcworkspace \
+            -scheme App \
+            -configuration Release \
+            -sdk iphoneos \
+            -derivedDataPath build \
+            -destination 'generic/platform=iOS' \
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGN_ENTITLEMENTS="" \
+            PROVISIONING_PROFILE_SPECIFIER="" \
+            ENABLE_BITCODE=NO \
+            clean build \
+            | xcbeautify || true
+          # Locate the built .app
+          APP_PATH=$(find build/Build/Products -type d -name "App.app" | head -1)
+          if [ -z "$APP_PATH" ]; then
+            echo "ERROR: App.app not found"
+            find build/Build -type d -name "*.app"
+            exit 1
+          fi
+          echo "Built: $APP_PATH"
+          # Wrap into Payload/.ipa
+          rm -rf Payload
+          mkdir Payload
+          cp -R "$APP_PATH" Payload/App.app
+          # Strip any signature stub so SideStore/AltStore can re-sign cleanly
+          rm -rf Payload/App.app/_CodeSignature || true
+          rm -rf Payload/App.app/embedded.mobileprovision || true
+          zip -r -X -q Toustream.ipa Payload
+          ls -lah Toustream.ipa
+
+      - name: Upload .ipa
+        uses: actions/upload-artifact@v4
+        with:
+          name: Toustream-ipa
+          path: ios/App/Toustream.ipa
+          if-no-files-found: error
+          retention-days: 30
